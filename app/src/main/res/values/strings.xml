@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">About Yourself</string>
+
+    <string name="top_header_text">Today</string>
+    <string name="mobile_usage">Of Total Mobile Usage</string>
+    <string name="which_is">Which is</string>
+    <string name="total_time">Of Your Total Time</string>
+    <string name="top_5_app_text">Top 5 Apps</string>
+    <string name="over_selected_time">Over Selected Time</string>
+
+    <string name="permission_text">App Usage Permission Not Granted</string>
+
+    <string name="click_permission_text">Enable</string>
+</resources>
