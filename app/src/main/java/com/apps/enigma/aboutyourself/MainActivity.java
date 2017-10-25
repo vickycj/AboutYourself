@@ -15,6 +15,7 @@ import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
@@ -30,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import me.itangqi.waveloadingview.WaveLoadingView;
+
 
 public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
 
@@ -42,11 +43,17 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
     ApplicationInfo applicationInfo ;
     AppOpsManager appOpsManager ;
 
-    TextView mtotalUsageTime;
 
-    WaveLoadingView mwaveLoadingView;
+    TextView mDays;
 
-    ListView listView;
+    TextView mHours;
+
+    TextView mMinutes;
+
+
+    TextView percentText;
+
+    ProgressBar mPercentProgress;
 
     ProgressBar progressBar;
 
@@ -54,25 +61,31 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.checking);
+        setContentView(R.layout.activity_main);
 
 
+         mDays=(TextView) findViewById(R.id.tv_days);
+
+        mHours=(TextView) findViewById(R.id.tv_hours);
+
+        mMinutes=(TextView) findViewById(R.id.tv_minutes);
 
 
-       /* usageStatsManager=(UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+        percentText=(TextView) findViewById(R.id.tv_percent_text);
+
+        mPercentProgress=(ProgressBar) findViewById(R.id.pb_percentage_of_day);
+
+        progressBar=(ProgressBar) findViewById(R.id.loading_bar);
+
+        usageStatsManager=(UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
 
         packageManager = getPackageManager();
 
         appOpsManager = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
 
-        mtotalUsageTime=(TextView) findViewById(R.id.tv_total_usage_time);
 
 
-        mwaveLoadingView =(WaveLoadingView) findViewById(R.id.wave_loading_view);
 
-        listView=(ListView) findViewById(R.id.lv_top5_apps);
-
-        progressBar=(ProgressBar) findViewById(R.id.progress_bar);
 
 
         if(!isAccessGranted()){
@@ -80,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
         }else{
             inVisiblePermission();
             startAsyncTask();
-        }*/
+        }
 
 
 
@@ -102,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
     @Override
     public void loadUsageData(Map<String, UsageStats> map) {
         HashMap<String,Long> totalMap;
-        HashMap<String,Long> topFiveMap;
+        HashMap<String,String> topFiveMap;
         Map<String,Long> sortedMap;
 
         totalMap=GeneralUtils.populateTheMap(map,packageManager);
@@ -115,12 +128,11 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
 
         double percent=GeneralUtils.calculatePercent(calculateTotalTime);
 
-        String convertedTime=GeneralUtils.convertLongToHours(calculateTotalTime);
+        String convertedTime=GeneralUtils.convertLongTime(calculateTotalTime);
 
-        setTotalTime(convertedTime);
+        setTime(calculateTotalTime);
 
-        setPercentage(percent);
-        setTopFiveApp(topFiveMap);
+        setProgressBar(percent);
 
         cancelLoading();
 
@@ -128,43 +140,21 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
     }
 
 
+public void setTime(long time){
+    mDays.setText(GeneralUtils.getDaysFromLong(time));
+    mHours.setText(GeneralUtils.getHoursFromLong(time));
+    mMinutes.setText(GeneralUtils.getMinutesFromLong(time));
+}
 
-    public void setTopFiveApp(HashMap<String,Long> topFiveMap){
-        List<Map<String, String>> data;
+public void setProgressBar(double percent){
 
-        data=GeneralUtils.topFiveConvert(topFiveMap);
-
-        SimpleAdapter adapter = new SimpleAdapter(this, data,
-                android.R.layout.simple_list_item_2,
-                new String[] {"title", "time"},
-                new int[] {android.R.id.text1,
-                        android.R.id.text2});
-        listView.setAdapter(adapter);
-    }
+    int per= (int) percent;
+    mPercentProgress.setProgress(per);
+    percentText.setText(per +"% of your total time");
+}
 
 
-    public void setTotalTime(String text){
-        mtotalUsageTime.setText(text);
-    }
 
-    public void setPercentage(double val){
-        int i=(int) val;
-        mwaveLoadingView.setProgressValue(i);
-        if(i<50){
-            mwaveLoadingView.setCenterTitle("");
-            mwaveLoadingView.setTopTitle("");
-            mwaveLoadingView.setBottomTitle(String.format("%d%%",i));
-
-        }else if(i<80){
-            mwaveLoadingView.setCenterTitle(String.format("%d%%",i));
-            mwaveLoadingView.setTopTitle("");
-            mwaveLoadingView.setBottomTitle("");
-        }else{
-            mwaveLoadingView.setCenterTitle("");
-            mwaveLoadingView.setTopTitle(String.format("%d%%",i));
-            mwaveLoadingView.setBottomTitle("");
-        }
-    }
 
 
     public class BackGroundTask extends AsyncTask<Void,Void,Map<String, UsageStats>>{
@@ -182,9 +172,14 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
         protected Map<String, UsageStats> doInBackground(Void... params) {
             Calendar cal ;
             cal=Calendar.getInstance();
-            cal.add(Calendar.DATE, -1);
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 1);
+            cal.set(Calendar.SECOND, 1);
+            cal.set(Calendar.MILLISECOND, 1);
 
-            return usageStatsManager.queryAndAggregateUsageStats(cal.getTimeInMillis(),System.currentTimeMillis());
+
+
+            return usageStatsManager.queryAndAggregateUsageStats(cal.getTimeInMillis(),Calendar.getInstance().getTimeInMillis());
         }
 
         @Override

@@ -3,6 +3,7 @@ package com.apps.enigma.aboutyourself;
 import android.app.usage.UsageStats;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,7 +52,7 @@ public class GeneralUtils {
 
             Map<String, String> datum = new HashMap<String, String>(2);
             datum.put("title", entry.getKey());
-            datum.put("time", convertLongToHours(entry.getValue()));
+            datum.put("time", convertLongTime(entry.getValue()));
             data.add(datum);
         }
 
@@ -83,14 +84,14 @@ public class GeneralUtils {
     }
 
 
-    public static HashMap<String,Long>  takeTopFive(Map<String,Long> map) {
+    public static HashMap<String,String>  takeTopFive(Map<String,Long> map) {
 
-        HashMap<String,Long> mapNew=new HashMap<>();
+        HashMap<String,String> mapNew=new HashMap<>();
         int count=0;
         for (Map.Entry<String, Long> entry : map.entrySet()) {
 
             if(count>4){break;}
-            mapNew.put(entry.getKey(),entry.getValue());
+            mapNew.put(entry.getKey(),convertLongTime(entry.getValue()));
             count++;
         }
 
@@ -99,19 +100,80 @@ public class GeneralUtils {
     }
 
 
-    public static String convertLongToHours(long l){
+    public static String convertLongTime(long l){
 
+        String time="";
 
-        long hours = TimeUnit.MILLISECONDS.toHours(l);
-        if(hours>0){
-            l -= TimeUnit.HOURS.toMillis(hours);
-            long minutes = TimeUnit.MILLISECONDS.toMinutes(l);
-            return hours+"h"+minutes+"m";
-        }else{
-            long minutes = TimeUnit.MILLISECONDS.toMinutes(l);
-            return minutes+"m";
+        String days=getDaysFromLong(l);
+
+        String hours=getHoursFromLong(l);
+
+        String minutes=getMinutesFromLong(l);
+
+        if(!days.equals("00")){
+            time+=days+"d";
+        }
+        if(!hours.equals("00")){
+            time+=hours+"h";
         }
 
+        if(!minutes.equals("00")){
+            time+=minutes+"m";
+        }
+
+        return  time;
+
+    }
+
+
+    public static String getDaysFromLong(long l){
+        long days=TimeUnit.MILLISECONDS.toDays(l);
+        if(days<0){
+            return "00";
+        }else if(days<=9){
+            return "0"+days;
+        }
+
+        return days+"";
+    }
+
+    public static String getHoursFromLong(long l){
+        long days=TimeUnit.MILLISECONDS.toDays(l);
+        if(days>0){
+            l -= TimeUnit.DAYS.toMillis(days);
+        }
+        long hours = TimeUnit.MILLISECONDS.toHours(l);
+
+        if(hours<0){
+            return "00";
+        }else if(hours<=9){
+            return "0"+hours;
+        }
+
+        return hours+"";
+    }
+
+
+    public static String getMinutesFromLong(long l){
+        long days=TimeUnit.MILLISECONDS.toDays(l);
+        if(days>0){
+            l -= TimeUnit.DAYS.toMillis(days);
+        }
+        long hours = TimeUnit.MILLISECONDS.toHours(l);
+
+        if(hours>0){
+            l -= TimeUnit.HOURS.toMillis(hours);
+        }
+
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(l);
+
+        if(minutes<0){
+            return "00";
+        }else if(minutes<=9){
+            return "0"+minutes;
+        }
+
+        return minutes+"";
     }
 
 
