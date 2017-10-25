@@ -15,6 +15,9 @@ import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -57,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
 
     ProgressBar progressBar;
 
+    RecyclerView mRecyclerView;
+
+    AppAdapter appAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +83,16 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
 
         progressBar=(ProgressBar) findViewById(R.id.loading_bar);
 
+
+        mRecyclerView=(RecyclerView) findViewById(R.id.recycler_view_main);
+
+
+
         usageStatsManager=(UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
 
+        appOpsManager = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
         packageManager = getPackageManager();
 
-        appOpsManager = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
 
 
 
@@ -91,6 +102,9 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
         if(!isAccessGranted()){
             visiblePermission();
         }else{
+
+
+
             inVisiblePermission();
             startAsyncTask();
         }
@@ -128,17 +142,29 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
 
         double percent=GeneralUtils.calculatePercent(calculateTotalTime);
 
-        String convertedTime=GeneralUtils.convertLongTime(calculateTotalTime);
+
 
         setTime(calculateTotalTime);
 
         setProgressBar(percent);
+
+        setTopFive(topFiveMap);
+
 
         cancelLoading();
 
 
     }
 
+
+    public void setTopFive( HashMap<String,String> topFiveMap){
+
+        appAdapter=new AppAdapter(topFiveMap,this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setAdapter(appAdapter);
+    }
 
 public void setTime(long time){
     mDays.setText(GeneralUtils.getDaysFromLong(time));

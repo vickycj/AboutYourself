@@ -3,6 +3,7 @@ package com.apps.enigma.aboutyourself;
 import android.app.usage.UsageStats;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -35,9 +36,9 @@ public class GeneralUtils {
 
             if(isPackageInstalled(packageName,packageManager)){
                 usageTime=entry.getValue().getTotalTimeInForeground();
-                appName=getAppName(packageName,packageManager);
+                ///appName=getAppName(packageName,packageManager);
 
-                mapNew.put(appName,usageTime);
+                mapNew.put(packageName,usageTime);
             }
         }
 
@@ -61,7 +62,7 @@ public class GeneralUtils {
     }
 
 
-    private static String getAppName(String packagename, PackageManager packageManager){
+    public static String getAppName(String packagename, PackageManager packageManager){
 
         ApplicationInfo ai;
         try {
@@ -71,6 +72,18 @@ public class GeneralUtils {
         }
         final String applicationName = (String) (ai != null ? packageManager.getApplicationLabel(ai) : "(unknown)");
         return applicationName;
+    }
+
+    public static Drawable getAppIcon(String packagename, PackageManager packageManager){
+
+        Drawable ai;
+        try {
+            ai = packageManager.getApplicationIcon(packagename);
+        } catch (final PackageManager.NameNotFoundException e) {
+            ai = null;
+        }
+
+        return ai;
     }
 
     private static boolean isPackageInstalled(String packagename, PackageManager packageManager) {
@@ -90,7 +103,7 @@ public class GeneralUtils {
         int count=0;
         for (Map.Entry<String, Long> entry : map.entrySet()) {
 
-            if(count>4){break;}
+           if(count>4){break;}
             mapNew.put(entry.getKey(),convertLongTime(entry.getValue()));
             count++;
         }
