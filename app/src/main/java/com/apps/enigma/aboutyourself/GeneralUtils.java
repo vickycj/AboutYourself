@@ -15,11 +15,19 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.apps.enigma.aboutyourself.MainActivity.WEEKLY_TAG;
+
 /**
  * Created by Vicky cj on 21-10-2017.
  */
 
 public class GeneralUtils {
+
+    public static final long ONE_DAY_MILLIS=86400000;
+
+    public static final long ONE_WEEK_MILLIS=604800000;
+
+    public static final long ONE_MONTH_MILLIS=2678400000L;
 
 
     public static HashMap<String,Long> populateTheMap(Map<String, UsageStats> map,PackageManager packageManager) {
@@ -113,6 +121,23 @@ public class GeneralUtils {
     }
 
 
+
+    public static HashMap<String,String>  convertMapTimeTOString(Map<String,Long> map) {
+
+        HashMap<String,String> mapNew=new HashMap<>();
+
+        for (Map.Entry<String, Long> entry : map.entrySet()) {
+
+
+            mapNew.put(entry.getKey(),convertLongTime(entry.getValue()));
+
+        }
+
+
+        return mapNew;
+    }
+
+
     public static String convertLongTime(long l){
 
         String time="";
@@ -132,6 +157,10 @@ public class GeneralUtils {
 
         if(!minutes.equals("00")){
             time+=minutes+"m";
+        }
+
+        if(time.equals("")){
+            time="0m";
         }
 
         return  time;
@@ -190,10 +219,10 @@ public class GeneralUtils {
     }
 
 
-    public static double calculatePercent(long j){
+    public static double calculatePercent(long j,long time){
 
 
-        long time = 86400000;
+
 
 
         double percentage=((double)j/(double)time)*100;
@@ -221,6 +250,31 @@ public class GeneralUtils {
         Map<String, Long> result = new TreeMap<String, Long>(compar);
         result.putAll(map);
         return result;
+    }
+
+    public static String getCurrentItemString(int id) {
+        String param = "";
+     switch (id) {
+            case 0: {
+                param = MainActivity.WEEKLY_TAG;
+                    break;
+            }
+            case 1: {
+
+                param = MainActivity.TODAY_TAG;
+                break;
+            }
+            case 2: {
+                param = MainActivity.MONTHLY_TAG;
+                break;
+            }
+            default: {
+                param="Apps Usage";
+            }
+
+
+        }
+        return param;
     }
 
 
