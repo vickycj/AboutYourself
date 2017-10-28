@@ -291,32 +291,7 @@ public class TomorrowFragment extends Fragment implements AsyncTaskPass {
 
     }
 
-    public void enablePermission(View v){
-        AlertDialog alertDialog = new AlertDialog.Builder(context)
-                .setTitle("Usage Access")
-                .setMessage("App will not run without usage access permissions.")
-                .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
 
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                        //intent.setComponent(new ComponentName("com.android.settings","com.android.settings.Settings$SecuritySettingsActivity"));
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivityForResult(intent,0);
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        dialog.dismiss();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .create();
-
-
-        alertDialog.show();
-    }
 
 
 

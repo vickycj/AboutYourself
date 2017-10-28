@@ -3,12 +3,15 @@ package com.apps.enigma.aboutyourself;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -80,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        mViewPager.setCurrentItem(1);
+
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -90,6 +93,33 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
         packageManager = getPackageManager();
 
 
+    }
+
+    public void enablePermission(View v){
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle("Usage Access")
+                .setMessage("App will not run without usage access permissions.")
+                .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                        //intent.setComponent(new ComponentName("com.android.settings","com.android.settings.Settings$SecuritySettingsActivity"));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivityForResult(intent,0);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .create();
+
+
+        alertDialog.show();
     }
 
     @Override
@@ -211,12 +241,12 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
                 case 0:{
 
 
-                    return YesterdayFragment.newInstance("","");
+                    return  TodayFragment.newInstance("","");
                 }
                 case 1:{
 
 
-                    return TodayFragment.newInstance("","");
+                    return YesterdayFragment.newInstance("","");
                 }
                 case 2:{
                     return TomorrowFragment.newInstance("","");
@@ -240,14 +270,18 @@ public class MainActivity extends AppCompatActivity implements AsyncTaskPass {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Last 7 days";
-                case 1:
                     return "Today";
+                case 1:
+                    return "Last 7 days";
                 case 2:
                     return "Last month";
             }
             return null;
         }
+
+
+
+
     }
 
 

@@ -256,12 +256,12 @@ public class GeneralUtils {
         String param = "";
      switch (id) {
             case 0: {
-                param = MainActivity.WEEKLY_TAG;
+                param = MainActivity.TODAY_TAG;
                     break;
             }
             case 1: {
 
-                param = MainActivity.TODAY_TAG;
+                param = MainActivity.WEEKLY_TAG;
                 break;
             }
             case 2: {
